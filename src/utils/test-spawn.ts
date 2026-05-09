@@ -73,7 +73,10 @@ export function spawnCollect(
       }
       reject(err);
     });
+    const onDisconnect = () => child.kill("SIGKILL");
+    process.on("disconnect", onDisconnect);
     child.on("close", (code) => {
+      process.off("disconnect", onDisconnect);
       if (settled) return;
       settled = true;
       resolve({ exitCode: code ?? -1, stdout, stderr });
