@@ -78,13 +78,11 @@ describe("SkillDetail — Quick Start section (issue #273)", () => {
     renderDetail();
     expect(screen.getByText("Install")).toBeTruthy();
     expect(
-      screen.getByText("Install the skill to your Claude Code environment"),
+      screen.getByText("Install the skill to your environment"),
     ).toBeTruthy();
-    // Note: install command appears twice (Quick Start + legacy card)
-    const installCommands = screen.getAllByText(
-      "asm install github:test/repo:skills/test-skill",
-    );
-    expect(installCommands.length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getByText("asm install github:test/repo:skills/test-skill"),
+    ).toBeTruthy();
   });
 
   it("uses the skill's installUrl for all three commands", () => {
@@ -99,19 +97,16 @@ describe("SkillDetail — Quick Start section (issue #273)", () => {
     expect(
       screen.getByText("asm eval github:custom/path:to/skill"),
     ).toBeTruthy();
-    // Note: install command appears twice (Quick Start + legacy card)
-    const installCommands = screen.getAllByText(
-      "asm install github:custom/path:to/skill",
-    );
-    expect(installCommands.length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getByText("asm install github:custom/path:to/skill"),
+    ).toBeTruthy();
   });
 
   it("renders copy buttons for each command", () => {
     renderDetail();
-    // The CopyButton component renders buttons - we should have at least 3 for Quick Start
-    // plus 1 for the legacy install command card = 4 total
+    // The CopyButton component renders buttons - we should have 3 for Quick Start
     const buttons = screen.getAllByRole("button");
-    expect(buttons.length).toBeGreaterThanOrEqual(4);
+    expect(buttons.length).toBeGreaterThanOrEqual(3);
   });
 
   it("does not render Quick Start section when installUrl is missing", () => {

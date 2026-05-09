@@ -301,7 +301,7 @@ export default function SkillDetail({ slim }) {
                   Install
                 </div>
                 <div className="text-xs text-[var(--fg-dim)] mb-2">
-                  Install the skill to your Claude Code environment
+                  Install the skill to your environment
                 </div>
                 <div className="flex items-center gap-2">
                   <code
@@ -320,13 +320,6 @@ export default function SkillDetail({ slim }) {
           </div>
         </Card>
       )}
-
-      <Card className="flex items-center gap-2 p-3">
-        <code className="flex-1 text-xs font-mono text-[var(--fg)] truncate">
-          {cmd}
-        </code>
-        <CopyButton text={cmd} size="md" />
-      </Card>
 
       <div className="flex items-center gap-2">
         <AddToBundleButton skill={skill} />
