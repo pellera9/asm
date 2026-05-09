@@ -45,8 +45,21 @@ website/assets/index-*.css
 
 # dev tools
 .claude
+.claude/
+.codex
+.codex/
+.gemini
+.gemini/
 .opencode
+.opencode/
 .agents/
+.cursor/
+.aider*
+.continue/
+.windsurf/
+.zed/
+.fleet/
+.history/
 openspec/
 docs/IMPLEMENTATION_PLAN.md
 TODOS.md
@@ -55,6 +68,46 @@ competitor-analysis.md
 
 .gitissue
 .gstack/
+
+# Caches
+.cache/
+.turbo/
+.parcel-cache/
+.next/
+.nuxt/
+.svelte-kit/
+.vite/
+.eslintcache
+.stylelintcache
+.tsbuildinfo
+*.tsbuildinfo
+.rollup.cache/
+.rpt2_cache/
+.rts2_cache_*/
+.npm/
+.yarn/cache/
+.yarn/install-state.gz
+.pnpm-store/
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.hypothesis/
+.ipynb_checkpoints/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
 # skill-auto-improver iteration artifacts (baseline + per-iter eval JSON + report)
 .asm-improver/
