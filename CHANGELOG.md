@@ -1,11 +1,32 @@
 # Changelog
 
-## Unreleased
+## v2.8.0 — 2026-05-20
+
+### Features
+
+- `asm uninstall <name>` — new command with full reverse-installation logic. Supports `-s <scope>` and `-t, --tool <provider>` filters, automatically relocates the real folder to another surviving provider when the canonical host is being removed, cleans up empty parent dirs, and shows scope/tool/relocation info in the confirmation prompt ([#279](https://github.com/luongnv89/asm/issues/279)) — @luongnv89
+- New `refresh-index` skill — re-ingests every already-enabled repo in `data/skill-index-resources.json` in one guided workflow (sync, classify into updated/unchanged/failed/skipped, verify catalog, then a confirmation-gated commit + PR). Inverse of `skill-index-updater` ([#290](https://github.com/luongnv89/asm/issues/290)) — @luongnv89
+- Reorder install tool list by user preference — `DEFAULT_PROVIDERS` now leads with claude, codex, opencode, pi, hermes, openclaw; added the `pi` provider; `mergeWithDefaults` now inserts newly-introduced default providers in their canonical priority slot (anchored to the nearest preceding default), so existing users see the new order on upgrade ([#291](https://github.com/luongnv89/asm/issues/291)) — @luongnv89
+- Repo-derived bundles — repo indexing now emits zero/one/multiple bundle records per repository, with explicit bundle metadata merged with best-effort inference. Bundles are exposed via CLI bundle load/list and the website bundle catalog; provenance to source repo and skill paths is preserved. 196 inferred bundles refreshed across 28 repos ([#275](https://github.com/luongnv89/asm/issues/275)) — @luongnv89
 
 ### Bug Fixes
 
-- `asm uninstall <name> -t <provider>` now preserves the `.skill-lock.json` entry (source-tracking metadata: `source`, `commitHash`, `ref`) when other providers still have the skill installed, so subsequent `asm list`/`asm update` keep working on the survivors. Implemented as a hybrid of the issue's option 2 + option 1: when a real-folder relocation moves the canonical home to a kept provider the lock entry's `provider` field is repointed at the new home; when no relocation happened (two-real-folders or repoint-only topology) the entry is left intact. The full-uninstall path (no `-t`) still drops the entry as before. Known caveat in the two-real-folders case: the lock points at one surviving provider; per-provider lock entries remain the long-term fix ([#284](https://github.com/luongnv89/asm/issues/284)) — @luongnv89
-- `fix(test):` Stop bundle modify/export tests from leaking installed skill copies into the user's real `~/.claude/skills/`. Each test now creates its source dir as `<tmpRoot>/<frontmatter-name>/` so the installer's destination basename matches the name the `uninstall` cleanup uses for lookup; a per-test `assertSkillUninstalled` guard fails the test if the install survives, and a one-shot `beforeAll` sweep removes any `cli-skill-for-*` leftovers accumulated by prior runs ([#288](https://github.com/luongnv89/asm/issues/288)) — @luongnv89
+- `asm uninstall <name> -t <provider>` now preserves the `.skill-lock.json` entry (source-tracking metadata: `source`, `commitHash`, `ref`) when other providers still have the skill installed, so subsequent `asm list`/`asm update` keep working on the survivors. When a real-folder relocation moves the canonical home to a kept provider the lock entry's `provider` field is repointed; when no relocation happened the entry is left intact. The full-uninstall path (no `-t`) still drops the entry as before ([#284](https://github.com/luongnv89/asm/issues/284)) — @luongnv89
+- Uninstaller now cleans up partial state on EXDEV cp fallback failure — when cross-device move fails mid-copy, the partial destination is removed instead of being left as half-written content ([#283](https://github.com/luongnv89/asm/issues/283)) — @luongnv89
+- Uninstaller surfaces relocation failures via non-zero exit code — relocation errors are no longer swallowed, so CI and scripted callers see the failure ([#282](https://github.com/luongnv89/asm/issues/282)) — @luongnv89
+- `fix(test):` Bundle modify/export tests no longer leak installed skill copies into the user's real `~/.claude/skills/`. Each test creates its source dir as `<tmpRoot>/<frontmatter-name>/` so the installer's destination basename matches the cleanup lookup; a per-test `assertSkillUninstalled` guard fails the test if the install survives, plus a one-shot `beforeAll` sweep removes any `cli-skill-for-*` leftovers from prior runs ([#288](https://github.com/luongnv89/asm/issues/288)) — @luongnv89
+- `fix(ci):` Replace apt-based trivy install with a binary download to avoid Azure mirror timeouts in the security workflow
+
+### Documentation
+
+- Document `asm bundle` command and the predefined bundles in the README ([#202](https://github.com/luongnv89/asm/issues/202)) — @luongnv89
+
+### Chores
+
+- Supply-chain hardening across npm and GitHub Actions — pinned versions, ignore-scripts hardening, lockfile checks, dependency cooldown declaration ([#277](https://github.com/luongnv89/asm/issues/277)) — @luongnv89
+- Refresh indexed skill sources across all 30 curated repos — net skill count updated across the catalog ([#295](https://github.com/luongnv89/asm/issues/295)) — @luongnv89
+
+**Full Changelog**: https://github.com/luongnv89/asm/compare/v2.7.0...v2.8.0
 
 ## v2.7.0 — 2026-05-10
 

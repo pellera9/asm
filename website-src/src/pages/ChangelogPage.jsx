@@ -27,6 +27,101 @@ function issue(n) {
 
 const ENTRIES = [
   {
+    version: "2.8.0",
+    date: "2026-05-20",
+    sections: [
+      {
+        tag: "added",
+        items: [
+          <>
+            <code>asm uninstall &lt;name&gt;</code> — new command with full
+            reverse-installation logic. Supports <code>-s &lt;scope&gt;</code>{" "}
+            and <code>-t, --tool &lt;provider&gt;</code> filters, automatically
+            relocates the real folder to another surviving provider when the
+            canonical host is being removed, cleans up empty parent dirs, and
+            shows scope/tool/relocation info in the confirmation prompt (
+            {issue(279)})
+          </>,
+          <>
+            New <code>refresh-index</code> skill — re-ingests every already-
+            enabled repo in <code>data/skill-index-resources.json</code> in one
+            guided workflow (sync, classify, verify catalog, then a
+            confirmation-gated commit + PR). Inverse of{" "}
+            <code>skill-index-updater</code> ({issue(290)})
+          </>,
+          <>
+            Reorder install tool list by user preference —{" "}
+            <code>DEFAULT_PROVIDERS</code> now leads with claude, codex,
+            opencode, pi, hermes, openclaw; added the <code>pi</code> provider;{" "}
+            <code>mergeWithDefaults</code> inserts new defaults in their
+            canonical priority slot on upgrade ({issue(291)})
+          </>,
+          <>
+            Repo-derived bundles — repo indexing now emits zero/one/multiple
+            bundle records per repository, merging explicit metadata with
+            best-effort inference. Exposed via CLI bundle load/list and the
+            website bundle catalog; 196 inferred bundles refreshed across 28
+            repos ({issue(275)})
+          </>,
+        ],
+      },
+      {
+        tag: "fixed",
+        items: [
+          <>
+            <code>asm uninstall &lt;name&gt; -t &lt;provider&gt;</code>{" "}
+            preserves the <code>.skill-lock.json</code> entry when other
+            providers still have the skill installed, so subsequent{" "}
+            <code>asm list</code>/<code>asm update</code> keep working on the
+            survivors. Full-uninstall (no <code>-t</code>) still drops the
+            entry as before ({issue(284)})
+          </>,
+          <>
+            Uninstaller cleans up partial state on EXDEV cp fallback failure —
+            half-written destinations are removed instead of being left behind
+            ({issue(283)})
+          </>,
+          <>
+            Uninstaller surfaces relocation failures via non-zero exit code, so
+            CI and scripted callers see the failure ({issue(282)})
+          </>,
+          <>
+            <code>fix(test):</code> Bundle modify/export tests no longer leak
+            installed skill copies into the user's real{" "}
+            <code>~/.claude/skills/</code> ({issue(288)})
+          </>,
+          <>
+            <code>fix(ci):</code> Replace apt-based trivy install with a binary
+            download to avoid Azure mirror timeouts
+          </>,
+        ],
+      },
+      {
+        tag: "docs",
+        items: [
+          <>
+            Document <code>asm bundle</code> command and the predefined bundles
+            in the README ({issue(202)})
+          </>,
+        ],
+      },
+      {
+        tag: "changed",
+        items: [
+          <>
+            Supply-chain hardening across npm and GitHub Actions — pinned
+            versions, ignore-scripts hardening, lockfile checks, dependency
+            cooldown declaration ({issue(277)})
+          </>,
+          <>
+            Refresh indexed skill sources across all 30 curated repos — net
+            skill count updated across the catalog ({issue(295)})
+          </>,
+        ],
+      },
+    ],
+  },
+  {
     version: "2.7.0",
     date: "2026-05-10",
     sections: [
