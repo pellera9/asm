@@ -1,5 +1,21 @@
 # Changelog
 
+## v2.9.0 — 2026-05-29
+
+### Features
+
+- `asm disable <target>` / `asm enable <target>` — curate the active skill set without uninstalling, so agents stop accidentally invoking unintended or conflicting skills (e.g. two code-review skills, or the word "workflow" in conversation triggering a workflow skill). Disabling renames an instance's `SKILL.md` → `SKILL.md.disabled` so both asm's scanner and external agents stop discovering it; enabling reverses the rename. Targeting supports individual names, wildcards (`'workflow*'`, `'*-review'`), prefixes (`openspec:`, `asc-`), bulk (`--all`), and `--tool` / `--scope` filters. State persists in `~/.config/agent-skill-manager/skill-state.json` keyed by (skill × tool × scope). `asm list` reconstructs disabled instances and renders them dimmed with a `[disabled]` tag; JSON output carries a `disabled` flag. Symlinked multi-provider installs share one `SKILL.md`, so a toggle honestly affects every tool sharing that source and warns accordingly ([#91](https://github.com/luongnv89/asm/issues/91)) — @luongnv89
+
+### Documentation
+
+- Bump landing-page skill count to 3,400+ in the page, og, and twitter meta descriptions (catalog now holds 3,493 skills) — @luongnv89
+
+### Chores
+
+- Remove residual Bun references across the project — `install.sh` rewritten from Bun to npm (checks Node ≥ 18 / npm ≥ 9 and instructs on failure rather than auto-installing a runtime); `docs/DEPLOYMENT.md`, `docs/DEVELOPMENT.md`, `CONTRIBUTING.md`, `prd.md`, and the bug-report template corrected to Node/npm; skill/agent docs point `bun run preindex` → `npm run preindex`; vestigial Bun-absence test guards removed and argv fixtures switched from `bun` to `node`. The `Bun.spawn`/`Bun.env` patterns in `src/security-auditor.ts` and `src/installer.ts` are intentionally kept as detection vocabulary for auditing third-party skills. Also corrected stale `@opentui/core` references left by the ink migration and restored dropped eval/publish and `bun:ffi` build-leak test coverage ([#293](https://github.com/luongnv89/asm/issues/293)) — @luongnv89
+
+**Full Changelog**: https://github.com/luongnv89/asm/compare/v2.8.0...v2.9.0
+
 ## v2.8.0 — 2026-05-20
 
 ### Features

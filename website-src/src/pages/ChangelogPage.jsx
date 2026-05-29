@@ -27,6 +27,63 @@ function issue(n) {
 
 const ENTRIES = [
   {
+    version: "2.9.0",
+    date: "2026-05-29",
+    sections: [
+      {
+        tag: "added",
+        items: [
+          <>
+            <code>asm disable &lt;target&gt;</code> /{" "}
+            <code>asm enable &lt;target&gt;</code> — curate the active skill set
+            without uninstalling, so agents stop accidentally invoking
+            unintended or conflicting skills (e.g. two code-review skills, or
+            the word &quot;workflow&quot; triggering a workflow skill).
+            Disabling renames an instance&apos;s <code>SKILL.md</code> →{" "}
+            <code>SKILL.md.disabled</code> so both asm&apos;s scanner and
+            external agents stop discovering it; enabling reverses it. Targeting
+            supports individual names, wildcards (<code>workflow*</code>,{" "}
+            <code>*-review</code>), prefixes (<code>openspec:</code>,{" "}
+            <code>asc-</code>), bulk (<code>--all</code>), and{" "}
+            <code>--tool</code> / <code>--scope</code> filters. State persists in{" "}
+            <code>~/.config/agent-skill-manager/skill-state.json</code>.{" "}
+            <code>asm list</code> shows disabled instances dimmed with a{" "}
+            <code>[disabled]</code> tag ({issue(91)})
+          </>,
+        ],
+      },
+      {
+        tag: "docs",
+        items: [
+          <>
+            Bump landing-page skill count to 3,400+ in the page, og, and twitter
+            meta descriptions (catalog now holds 3,493 skills)
+          </>,
+        ],
+      },
+      {
+        tag: "changed",
+        items: [
+          <>
+            Remove residual Bun references across the project —{" "}
+            <code>install.sh</code> rewritten from Bun to npm; docs (
+            <code>DEPLOYMENT.md</code>, <code>DEVELOPMENT.md</code>,{" "}
+            <code>CONTRIBUTING.md</code>, <code>prd.md</code>) and the bug-report
+            template corrected to Node/npm; skill/agent docs point{" "}
+            <code>bun run preindex</code> → <code>npm run preindex</code>;
+            vestigial Bun-absence test guards removed. The{" "}
+            <code>Bun.spawn</code>/<code>Bun.env</code> patterns in{" "}
+            <code>src/security-auditor.ts</code> and{" "}
+            <code>src/installer.ts</code> are intentionally kept as detection
+            vocabulary for auditing third-party skills. Also corrected stale{" "}
+            <code>@opentui/core</code> references left by the ink migration (
+            {issue(293)})
+          </>,
+        ],
+      },
+    ],
+  },
+  {
     version: "2.8.0",
     date: "2026-05-20",
     sections: [
