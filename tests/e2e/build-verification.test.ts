@@ -35,15 +35,16 @@ describe("build: dist entry point", () => {
   });
 });
 
-// ─── bun:ffi regression (issue #35) ─────────────────────────────────────────
+// ─── no bun:ffi leak (issue #35 regression) ─────────────────────────────────
+// The bun:ffi native dependency was removed in #224. This guard ensures it
+// never creeps back into a shipped artifact: a literal "bun:ffi" import would
+// make Node throw ERR_UNSUPPORTED_ESM_URL_SCHEME at runtime.
 
 describe("build: no bun:ffi leak (issue #35 regression)", () => {
   test('no dist file contains a literal "bun:ffi" import', () => {
     const files = readdirSync(DIST).filter((f) => f.endsWith(".js"));
     for (const file of files) {
       const content = readFileSync(join(DIST, file), "utf-8");
-      // The stub replaces bun:ffi at build time. If the literal protocol
-      // string leaks through, Node.js will throw ERR_UNSUPPORTED_ESM_URL_SCHEME.
       const hasBunFfi =
         content.includes('from "bun:ffi"') ||
         content.includes("from 'bun:ffi'") ||
@@ -151,7 +152,7 @@ const catalogExists = existsSync(CATALOG_PATH);
 
 describe("catalog: preserves all distinct install targets (issue #201)", () => {
   if (!catalogExists) {
-    test.skip("catalog.json not present — run `bun scripts/build-catalog.ts` to generate it", () => {});
+    test.skip("catalog.json not present — run `npx tsx scripts/build-catalog.ts` to generate it", () => {});
     return;
   }
   const catalog = JSON.parse(readFileSync(CATALOG_PATH, "utf-8"));
@@ -271,7 +272,7 @@ const SKILLS_DETAIL_DIR = join(WEBSITE_DIR, "skills");
 
 describe("catalog: split artifacts (issue #214)", () => {
   if (!catalogExists || !existsSync(SKILLS_MIN_PATH)) {
-    test.skip("split artifacts not present — run `bun scripts/build-catalog.ts` to generate them", () => {});
+    test.skip("split artifacts not present — run `npx tsx scripts/build-catalog.ts` to generate them", () => {});
     return;
   }
   const catalog = JSON.parse(readFileSync(CATALOG_PATH, "utf-8"));
