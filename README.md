@@ -62,7 +62,7 @@ The more AI agents you use, the worse this gets. Every new tool adds another ski
 - **Install from GitHub in one command** — `asm install github:user/repo` handles cloning, validation, and placement. Supports single-skill repos, multi-skill collections, subfolder URLs, and private repos via SSH.
 - **Catch problems before they bite** — Built-in security scanning flags dangerous patterns (shell execution, network access, credential exposure, obfuscation) before you install. Duplicate audit finds and cleans redundant skills across providers.
 - **Create, test, and publish skills** — Scaffold new skills with `asm init`, symlink them for live development with `asm link`, audit for security issues, verify metadata, and publish to the [ASM Registry](https://github.com/luongnv89/asm-registry) with a single command. [See the full local dev workflow &darr;](#build-test-and-ship-your-own-skills)
-- **Works with every major agent** — 18 providers built-in: Claude Code, Codex, OpenClaw, Cursor, Windsurf, Cline, Roo Code, Continue, GitHub Copilot, Aider, OpenCode, Zed, Augment, Amp, Gemini CLI, Google Antigravity, Hermes, and a generic Agents provider. Add custom providers in seconds via config.
+- **Works with every major agent** — 19 providers built-in: Claude Code, Codex, OpenClaw, Cursor, Windsurf, Cline, Roo Code, Continue, GitHub Copilot, Aider, OpenCode, Zed, Augment, Amp, Gemini CLI, Google Antigravity, Pi, Hermes, and a generic Agents provider. Add custom providers in seconds via config.
 - **Two interfaces, one tool** — Full interactive TUI with keyboard navigation, search, and detail views. Or use the CLI with `--json` for scripting and automation.
 
 <p align="center">
@@ -474,7 +474,7 @@ asm install github:anthropics/skills --all
 
 ## Supported Agent Tools
 
-`asm` ships with **18 built-in providers**, all enabled by default. Disable any you don't need via `asm config edit`.
+`asm` ships with **19 built-in providers**, all enabled by default. Disable any you don't need via `asm config edit`.
 
 | Tool               | Global Path                       | Project Path            | Default |
 | ------------------ | --------------------------------- | ----------------------- | :-----: |
@@ -495,6 +495,7 @@ asm install github:anthropics/skills --all
 | Amp                | `~/.amp/skills/`                  | `.amp/skills/`          | enabled |
 | Gemini CLI         | `~/.gemini/skills/`               | `.gemini/skills/`       | enabled |
 | Google Antigravity | `~/.antigravity/skills/`          | `.antigravity/skills/`  | enabled |
+| Pi                 | `~/.pi/skills/`                   | `.pi/skills/`           | enabled |
 | Hermes             | `~/.hermes/skills/`               | `.hermes/skills/`       | enabled |
 
 Disable a provider — opens config in `$EDITOR`, set `"enabled": false` for any provider:
@@ -513,10 +514,10 @@ Need a tool not listed? Add a custom provider entry to the config.
 Yes. `asm` is MIT licensed and free forever. No accounts, no telemetry, no paywalls.
 
 **Is it actively maintained?**
-Yes — actively developed with frequent tagged releases (44 and counting, latest v2.9.0). Check the [changelog](docs/CHANGELOG.md) for the full history.
+Yes — actively developed with frequent tagged releases (45 and counting, latest v2.10.0). Check the [changelog](docs/CHANGELOG.md) for the full history.
 
 **Which AI agents does it support?**
-18 providers built-in: Claude Code, Codex, OpenClaw, Cursor, Windsurf, Cline, Roo Code, Continue, GitHub Copilot, Aider, OpenCode, Zed, Augment, Amp, Gemini CLI, Google Antigravity, Hermes, and a generic Agents provider. All 18 are enabled by default; disable any you don't need via `asm config edit`. You can also add any custom agent that stores skills as directories with a `SKILL.md` file.
+19 providers built-in: Claude Code, Codex, OpenClaw, Cursor, Windsurf, Cline, Roo Code, Continue, GitHub Copilot, Aider, OpenCode, Zed, Augment, Amp, Gemini CLI, Google Antigravity, Pi, Hermes, and a generic Agents provider. All 19 are enabled by default; disable any you don't need via `asm config edit`. You can also add any custom agent that stores skills as directories with a `SKILL.md` file.
 
 **How does it compare to managing skills manually?**
 Manual management means remembering where each agent stores skills, cloning repos by hand, checking for duplicates yourself, and having no security scanning. `asm` automates all of that with one command.
@@ -858,7 +859,7 @@ The install command clones the repository, validates `SKILL.md` files, scans for
 <details>
 <summary><strong>Configuration</strong></summary>
 
-On first run, a config file is created at `~/.config/agent-skill-manager/config.json` with 18 default providers, all enabled:
+On first run, a config file is created at `~/.config/agent-skill-manager/config.json` with 19 default providers, all enabled:
 
 ```json
 {

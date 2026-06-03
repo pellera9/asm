@@ -1,5 +1,22 @@
 # Changelog
 
+## v2.10.0 — 2026-06-03
+
+### Features
+
+- New `find-me-skills` skill — a conversational skill for users who have a goal but don't know which Agent Skills they need. It collects intent, confirms the user's situation, queries the live `asm` catalog (`asm search --available --json`), dedupes and explains the matches, lays out a step-by-step path with per-step inputs/outputs, and on approval emits an installable BundleManifest the user runs with `asm bundle install ./file.json`. Uses the CLI as the runtime discovery surface, so it works on any machine — not just the asm repo ([#281](https://github.com/luongnv89/asm/issues/281)) — @luongnv89
+
+### Documentation
+
+- Fix the stale landing docs page — correct the Node/npm prerequisite, add the `pi` provider (19), document `asm disable`/`asm enable`, and align on the canonical `author` field — @luongnv89
+- Backfill v2.7.0–v2.9.0 in `docs/CHANGELOG.md` and refresh the README maintained line — @luongnv89
+
+### Chores
+
+- Refresh indexed skill sources — re-ingested all enabled repos in `data/skill-index-resources.json` (31 updated, 0 unchanged, 0 failed, 1 skipped) ([#299](https://github.com/luongnv89/asm/issues/299)) — @luongnv89
+
+**Full Changelog**: https://github.com/luongnv89/asm/compare/v2.9.0...v2.10.0
+
 ## v2.9.0 — 2026-05-29
 
 ### Features

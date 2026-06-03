@@ -27,6 +27,54 @@ function issue(n) {
 
 const ENTRIES = [
   {
+    version: "2.10.0",
+    date: "2026-06-03",
+    sections: [
+      {
+        tag: "added",
+        items: [
+          <>
+            New <code>find-me-skills</code> skill — a conversational skill for
+            users who have a goal but don&apos;t know which Agent Skills they
+            need. It collects intent, confirms the user&apos;s situation,
+            queries the live <code>asm</code> catalog (
+            <code>asm search --available --json</code>), dedupes and explains
+            the matches, lays out a step-by-step path with per-step
+            inputs/outputs, and on approval emits an installable BundleManifest
+            the user runs with <code>asm bundle install ./file.json</code>. Uses
+            the CLI as the runtime discovery surface, so it works on any machine
+            — not just the asm repo ({issue(281)})
+          </>,
+        ],
+      },
+      {
+        tag: "docs",
+        items: [
+          <>
+            Fix the stale landing docs page — correct the Node/npm prerequisite,
+            add the <code>pi</code> provider (19), document{" "}
+            <code>asm disable</code>/<code>asm enable</code>, and align on the
+            canonical <code>author</code> field
+          </>,
+          <>
+            Backfill v2.7.0–v2.9.0 in <code>docs/CHANGELOG.md</code> and refresh
+            the README maintained line
+          </>,
+        ],
+      },
+      {
+        tag: "changed",
+        items: [
+          <>
+            Refresh indexed skill sources — re-ingested all enabled repos in{" "}
+            <code>data/skill-index-resources.json</code> (31 updated, 0
+            unchanged, 0 failed, 1 skipped) ({issue(299)})
+          </>,
+        ],
+      },
+    ],
+  },
+  {
     version: "2.9.0",
     date: "2026-05-29",
     sections: [
@@ -45,8 +93,8 @@ const ENTRIES = [
             supports individual names, wildcards (<code>workflow*</code>,{" "}
             <code>*-review</code>), prefixes (<code>openspec:</code>,{" "}
             <code>asc-</code>), bulk (<code>--all</code>), and{" "}
-            <code>--tool</code> / <code>--scope</code> filters. State persists in{" "}
-            <code>~/.config/agent-skill-manager/skill-state.json</code>.{" "}
+            <code>--tool</code> / <code>--scope</code> filters. State persists
+            in <code>~/.config/agent-skill-manager/skill-state.json</code>.{" "}
             <code>asm list</code> shows disabled instances dimmed with a{" "}
             <code>[disabled]</code> tag ({issue(91)})
           </>,
@@ -68,8 +116,8 @@ const ENTRIES = [
             Remove residual Bun references across the project —{" "}
             <code>install.sh</code> rewritten from Bun to npm; docs (
             <code>DEPLOYMENT.md</code>, <code>DEVELOPMENT.md</code>,{" "}
-            <code>CONTRIBUTING.md</code>, <code>prd.md</code>) and the bug-report
-            template corrected to Node/npm; skill/agent docs point{" "}
+            <code>CONTRIBUTING.md</code>, <code>prd.md</code>) and the
+            bug-report template corrected to Node/npm; skill/agent docs point{" "}
             <code>bun run preindex</code> → <code>npm run preindex</code>;
             vestigial Bun-absence test guards removed. The{" "}
             <code>Bun.spawn</code>/<code>Bun.env</code> patterns in{" "}
@@ -130,13 +178,13 @@ const ENTRIES = [
             preserves the <code>.skill-lock.json</code> entry when other
             providers still have the skill installed, so subsequent{" "}
             <code>asm list</code>/<code>asm update</code> keep working on the
-            survivors. Full-uninstall (no <code>-t</code>) still drops the
-            entry as before ({issue(284)})
+            survivors. Full-uninstall (no <code>-t</code>) still drops the entry
+            as before ({issue(284)})
           </>,
           <>
             Uninstaller cleans up partial state on EXDEV cp fallback failure —
-            half-written destinations are removed instead of being left behind
-            ({issue(283)})
+            half-written destinations are removed instead of being left behind (
+            {issue(283)})
           </>,
           <>
             Uninstaller surfaces relocation failures via non-zero exit code, so

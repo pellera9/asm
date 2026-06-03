@@ -598,7 +598,7 @@ metadata:
         <p>
           Config file is created at{" "}
           <code>~/.config/agent-skill-manager/config.json</code> on first run
-          with 18 default providers.
+          with 19 default providers.
         </p>
         <table>
           <thead>
@@ -1030,10 +1030,7 @@ asm uninstall code-review -s project  # Remove project copy only`}</CodeBlock>
           </thead>
           <tbody>
             <Row cmd="<name>" desc="Exact skill name or directory name" />
-            <Row
-              cmd="'<glob>*'"
-              desc="Glob match (* matches any characters)"
-            />
+            <Row cmd="'<glob>*'" desc="Glob match (* matches any characters)" />
             <Row
               cmd="<prefix>: or <prefix>-"
               desc="Prefix match (e.g. openspec:, asc-)"

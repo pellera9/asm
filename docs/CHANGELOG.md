@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.10.0] - 2026-06-03
+
+### Added
+
+- New `find-me-skills` skill — a conversational skill for users who have a goal but don't know which Agent Skills they need. It collects intent, confirms the user's situation, queries the live `asm` catalog (`asm search --available --json`), dedupes and explains the matches, lays out a step-by-step path with per-step inputs/outputs, and on approval emits an installable BundleManifest the user runs with `asm bundle install ./file.json`. Uses the CLI as the runtime discovery surface, so it works on any machine — not just the asm repo (#281)
+
+### Changed
+
+- Refresh indexed skill sources — re-ingested all enabled repos in `data/skill-index-resources.json` (31 updated, 0 unchanged, 0 failed, 1 skipped) (#299)
+- Fix stale documentation — correct the landing docs page (Node/npm prerequisite, `pi` provider, `asm disable`/`asm enable`, canonical `author` field) and backfill v2.7.0–v2.9.0 in `docs/CHANGELOG.md` with a refreshed README maintained line
+
 ## [2.9.0] - 2026-05-29
 
 ### Added
