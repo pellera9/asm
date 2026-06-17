@@ -3297,6 +3297,117 @@ describe("CLI integration: install --path/--all subpath discovery", () => {
     }
   });
 
+  test("--all on repo with root SKILL.md and nested skills discovers all (issue #305)", async () => {
+    const tmpDir = await mkdtemp(join(tmpdir(), "asm-install-305-"));
+    try {
+      const src = join(tmpDir, "src");
+      await mkdir(join(src, "skills", "nested-one"), { recursive: true });
+      await writeFile(
+        join(src, "SKILL.md"),
+        "---\nname: root-index\nversion: 1.0.0\ndescription: Root\n---\n# Root\n",
+      );
+      await writeFile(
+        join(src, "skills", "nested-one", "SKILL.md"),
+        "---\nname: nested-one\nversion: 1.0.0\ndescription: Nested\n---\n# Nested\n",
+      );
+
+      const { stdout, stderr, exitCode } = await runCLIWithHome(
+        tmpDir,
+        "install",
+        src,
+        "--all",
+        "-y",
+        "-p",
+        "claude",
+        "--scope",
+        "global",
+      );
+      const all = stdout + "\n" + stderr;
+      expect(all).not.toContain("Invalid skill name");
+      expect(all).not.toContain("Duplicate skill names");
+      expect(exitCode).toBe(0);
+      expect(all).toMatch(/root-index/);
+      expect(all).toMatch(/nested-one/);
+    } finally {
+      await rm(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  test("--all blocks two skills that share a target dir basename even with distinct frontmatter names (issue #305 regression)", async () => {
+    // Both skills live in a directory named `tool`, so both would install to
+    // skills/tool and silently overwrite. Distinct frontmatter names
+    // (alpha/beta) must NOT mask the real collision — dedup keys on basename.
+    const tmpDir = await mkdtemp(join(tmpdir(), "asm-install-305-basename-"));
+    try {
+      const src = join(tmpDir, "src");
+      await mkdir(join(src, "a", "tool"), { recursive: true });
+      await mkdir(join(src, "b", "tool"), { recursive: true });
+      await writeFile(
+        join(src, "a", "tool", "SKILL.md"),
+        "---\nname: alpha\nversion: 1.0.0\ndescription: Alpha\n---\n# Alpha\n",
+      );
+      await writeFile(
+        join(src, "b", "tool", "SKILL.md"),
+        "---\nname: beta\nversion: 1.0.0\ndescription: Beta\n---\n# Beta\n",
+      );
+
+      const { stderr, exitCode } = await runCLIWithHome(
+        tmpDir,
+        "install",
+        src,
+        "--all",
+        "-y",
+        "-p",
+        "claude",
+        "--scope",
+        "global",
+      );
+      expect(exitCode).not.toBe(0);
+      expect(stderr).toContain("Duplicate skill names");
+      expect(stderr).toContain("tool");
+    } finally {
+      await rm(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  test("--all installs two skills with distinct basenames even when their frontmatter names collide (issue #305 regression)", async () => {
+    // foo/ and bar/ install to distinct target dirs, so a shared frontmatter
+    // name is NOT a real collision and must not be falsely blocked.
+    const tmpDir = await mkdtemp(
+      join(tmpdir(), "asm-install-305-frontmatter-"),
+    );
+    try {
+      const src = join(tmpDir, "src");
+      await mkdir(join(src, "foo"), { recursive: true });
+      await mkdir(join(src, "bar"), { recursive: true });
+      await writeFile(
+        join(src, "foo", "SKILL.md"),
+        "---\nname: shared\nversion: 1.0.0\ndescription: Foo\n---\n# Foo\n",
+      );
+      await writeFile(
+        join(src, "bar", "SKILL.md"),
+        "---\nname: shared\nversion: 1.0.0\ndescription: Bar\n---\n# Bar\n",
+      );
+
+      const { stdout, stderr, exitCode } = await runCLIWithHome(
+        tmpDir,
+        "install",
+        src,
+        "--all",
+        "-y",
+        "-p",
+        "claude",
+        "--scope",
+        "global",
+      );
+      const all = stdout + "\n" + stderr;
+      expect(all).not.toContain("Duplicate skill names");
+      expect(exitCode).toBe(0);
+    } finally {
+      await rm(tmpDir, { recursive: true, force: true });
+    }
+  });
+
   test("bare --all (no subpath) on a repo with name collisions still errors (regression guard)", async () => {
     const tmpDir = await mkdtemp(join(tmpdir(), "asm-install-252-regress-"));
     try {
