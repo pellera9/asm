@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-18T00:00:00Z",
+  "updatedAt": "2026-06-29T00:00:00Z",
   "repos": [
     {
       "source": "github:luongnv89/asm",
@@ -88,6 +88,15 @@
       "owner": "luongnv89",
       "repo": "skills",
       "description": "Reusable skills to supercharge your AI agents",
+      "maintainer": "@luongnv89",
+      "enabled": true
+    },
+    {
+      "source": "github:luongnv89/idd",
+      "url": "https://github.com/luongnv89/idd",
+      "owner": "luongnv89",
+      "repo": "idd",
+      "description": "Turn GitHub Issues Into Structured, Agent-Ready Work Orders",
       "maintainer": "@luongnv89",
       "enabled": true
     },
