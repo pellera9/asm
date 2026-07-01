@@ -48,7 +48,7 @@ Defines the evals for a skill. Located at `evals/evals.json` within the skill di
 
 ## misfires.jsonl
 
-The misfire log — the feedback flywheel from real usage back into evals. Located at `evals/misfires.jsonl` within the skill directory; append-only, one JSON object per line. Append a line whenever the skill misbehaves in real use: fired when it shouldn't, failed to fire, or fired and did the wrong thing. Any session can append; no tooling required.
+The misfire log — the feedback flywheel from real usage back into evals. Located at `evals/misfires.jsonl` within the skill directory; one JSON object per line. During normal use, sessions only append — never rewrite or reorder existing lines. Append a line whenever the skill misbehaves in real use: fired when it shouldn't, failed to fire, or fired and did the wrong thing. Any session can append; no tooling required. Entries are only removed or marked when Path B2 converts them into evals (below).
 
 ```json
 {
@@ -343,7 +343,7 @@ Output from Benchmark mode. Located at `benchmarks/<timestamp>/benchmark.json`.
   - `result`: Nested object with `pass_rate`, `passed`, `total`, `time_seconds`, `tokens`, `errors`
 - `run_summary`: Statistical aggregates per configuration
   - `with_skill` / `without_skill`: Each contains `pass_rate`, `time_seconds`, `tokens` objects with `mean` and `stddev` fields
-  - `delta`: Difference strings like `"+0.50"`, `"+13.0"`, `"+1700"`
+  - `delta`: Difference strings like `"+0.50"`, `"+13.0"`, `"+1700"` — computed only over evals present in both configurations; negative-trigger runs have no baseline and are excluded (see Step 4 in `references/eval-loop.md`)
 - `notes`: Freeform observations from the analyzer
 
 **Important:** The viewer reads these field names exactly. Using `config` instead of `configuration`, or putting `pass_rate` at the top level of a run instead of nested under `result`, will cause the viewer to show empty/zero values. Always reference this schema when generating benchmark.json manually.

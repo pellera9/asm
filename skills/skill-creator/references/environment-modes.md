@@ -6,6 +6,8 @@ The core workflow (draft → test → review → improve → repeat) is the same
 
 Claude.ai doesn't have subagents, so parts of the flow have to be done serially or skipped.
 
+**Adversarial review without subagents**: No Agent tool means no fresh reviewer context. Copy the phase 1–3 prompts from `references/validation-prompts.md` into a separate, fresh Claude session (a new conversation that hasn't seen the draft), then paste its findings back and fix the real ones. If a truly fresh session isn't possible, run the phases yourself and treat the results as a weaker self-review — you wrote the draft, so you'll fill gaps from memory. Compensate by holding the line on the eval floor (≥3 happy-path, ≥1 edge, ≥1 negative-trigger) and the human review step.
+
 **Running test cases**: No subagents means no parallel execution. For each test case, read the skill's SKILL.md, then follow its instructions to accomplish the test prompt yourself. Do them one at a time. This is less rigorous than independent subagents (you wrote the skill and you're also running it, so you have full context), but it's a useful sanity check — and the human review step compensates. Skip the baseline runs — just use the skill to complete the task as requested.
 
 **Reviewing results**: If you can't open a browser (e.g., Claude.ai's VM has no display, or you're on a remote server), skip the browser reviewer entirely. Instead, present results directly in the conversation. For each test case, show the prompt and the output. If the output is a file the user needs to see (like a .docx or .xlsx), save it to the filesystem and tell them where it is so they can download and inspect it. Ask for feedback inline: "How does this look? Anything you'd change?"

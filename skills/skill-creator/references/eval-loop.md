@@ -24,7 +24,7 @@ Execute this task:
 - **Creating a new skill**: no skill at all. Same prompt, no skill path, save to `without_skill/outputs/`.
 - **Improving an existing skill**: the old version. Before editing, snapshot the skill (`cp -r <skill-path> <workspace>/skill-snapshot/`), then point the baseline subagent at the snapshot. Save to `old_skill/outputs/`.
 
-**Negative-trigger evals** (`kind: negative-trigger`) run with-skill only — no baseline; the comparison is meaningless when the skill shouldn't fire. Their assertions check that the run did _not_ apply the skill's workflow (no skill scripts invoked, no skill report format, the adjacent task handled on its own merits).
+**Negative-trigger evals** (`kind: negative-trigger`) run with-skill only — no baseline; the comparison is meaningless when the skill shouldn't fire. Their assertions check that the run did _not_ apply the skill's workflow (no skill scripts invoked, no skill report format, the adjacent task handled on its own merits). Because they have no baseline counterpart, they're excluded from the with_skill vs without_skill delta in Step 4.
 
 Write an `eval_metadata.json` for each test case (assertions can be empty for now). Give each eval a descriptive name based on what it's testing — not just "eval-0". Use this name for the directory too. If this iteration uses new or modified eval prompts, create these files for each new eval directory — don't assume they carry over from previous iterations.
 
@@ -75,6 +75,8 @@ Once all runs are done:
 
    This produces `benchmark.json` and `benchmark.md` with pass_rate, time, and tokens for each configuration, with mean ± stddev and the delta. If generating benchmark.json manually, see `references/schemas.md` for the exact schema the viewer expects.
    Put each with_skill version before its baseline counterpart.
+
+   **Exclude negative-trigger runs from the delta.** They run with-skill only (Step 1), so they have no baseline counterpart — and the aggregation script pools every run it finds per configuration, which would silently bias the with_skill summary and the delta. Aggregate the with_skill vs without_skill comparison only over evals present in both configurations (e.g., run the script with the negative-trigger eval directories moved aside or omitted), and report negative-trigger pass/fail separately in the analyst notes.
 
 3. **Do an analyst pass** — read the benchmark data and surface patterns the aggregate stats might hide. See `agents/analyzer.md` (the "Analyzing Benchmark Results" section) for what to look for — things like assertions that always pass regardless of skill (non-discriminating), high-variance evals (possibly flaky), and time/token tradeoffs.
 
