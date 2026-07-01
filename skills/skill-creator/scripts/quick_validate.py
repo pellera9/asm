@@ -98,7 +98,7 @@ def validate_skill(skill_path):
         # by the runtime when the harness exceeds its skills context budget (~2%).
         # Tail-first truncation tends to chop off the negative-trigger clause,
         # which is the part that prevents false-positive triggering.
-        # See SKILL.md "Description length budget" for guidance.
+        # See references/description-guide.md "Description length budget" for guidance.
         DESCRIPTION_RUNTIME_TARGET = 250
         if len(description) > DESCRIPTION_RUNTIME_TARGET:
             print(
@@ -106,8 +106,9 @@ def validate_skill(skill_path):
                 f"recommended runtime target of {DESCRIPTION_RUNTIME_TARGET}. "
                 "When the harness exceeds its skills context budget, descriptions "
                 "get truncated tail-first — usually chopping the negative-trigger "
-                "clause. Consider trimming. See skill-creator SKILL.md "
-                "'Description length budget' for techniques.",
+                "clause. Consider trimming. See skill-creator "
+                "references/description-guide.md 'Description length budget' "
+                "for techniques.",
                 file=sys.stderr,
             )
         # Warn (non-fatal) if the description appears to lack a "negative trigger" clause.
