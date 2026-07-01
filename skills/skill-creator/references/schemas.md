@@ -14,10 +14,21 @@ Defines the evals for a skill. Located at `evals/evals.json` within the skill di
   "evals": [
     {
       "id": 1,
+      "kind": "happy-path",
       "prompt": "User's example prompt",
       "expected_output": "Description of expected result",
       "files": ["evals/files/sample1.pdf"],
       "expectations": ["The output includes X", "The skill used script Y"]
+    },
+    {
+      "id": 2,
+      "kind": "negative-trigger",
+      "prompt": "An adjacent-domain request the skill should NOT handle",
+      "expected_output": "Task handled normally, without applying the skill's workflow",
+      "files": [],
+      "expectations": [
+        "The run did not invoke the skill's scripts or report format"
+      ]
     }
   ]
 }
@@ -27,10 +38,38 @@ Defines the evals for a skill. Located at `evals/evals.json` within the skill di
 
 - `skill_name`: Name matching the skill's frontmatter
 - `evals[].id`: Unique integer identifier
+- `evals[].kind`: `"happy-path"` (default if omitted), `"edge"`, or `"negative-trigger"`. A test set needs ≥3 happy-path, ≥1 edge, ≥1 negative-trigger — see the Test Cases floor in `references/writing-guide.md`.
 - `evals[].prompt`: The task to execute
 - `evals[].expected_output`: Human-readable description of success
 - `evals[].files`: Optional list of input file paths (relative to skill root)
-- `evals[].expectations`: List of verifiable statements
+- `evals[].expectations`: List of verifiable statements. Happy-path evals include at least one process assertion (the run followed the skill's mandated path).
+
+---
+
+## misfires.jsonl
+
+The misfire log — the feedback flywheel from real usage back into evals. Located at `evals/misfires.jsonl` within the skill directory; append-only, one JSON object per line. Append a line whenever the skill misbehaves in real use: fired when it shouldn't, failed to fire, or fired and did the wrong thing. Any session can append; no tooling required.
+
+```json
+{
+  "date": "2026-07-02",
+  "failure": "wrong-behavior",
+  "prompt": "paraphrase of what the user asked",
+  "expected": "what should have happened",
+  "actual": "what the skill did",
+  "note": "optional context"
+}
+```
+
+**Fields:**
+
+- `date`: ISO date of the misfire
+- `failure`: `"no-trigger"` (should have fired, didn't), `"false-trigger"` (fired on an adjacent task), or `"wrong-behavior"` (fired, produced the wrong process/output)
+- `prompt`: The user request, verbatim or paraphrased
+- `expected` / `actual`: One line each
+- `note`: Optional — environment, input quirk, anything that explains it
+
+When improving a skill (Path B2), read this file **first** — each line is a real failure a user already hit, which makes it the highest-signal eval candidate available. Convert misfires into eval cases (`no-trigger`/`false-trigger` → trigger-test or `negative-trigger` evals; `wrong-behavior` → a functional eval reproducing the prompt), then delete or mark the lines you've converted.
 
 ---
 

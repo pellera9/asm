@@ -104,12 +104,13 @@ def package_skill(skill_path, output_dir=None):
         return skill_filename
 
     except Exception as e:
-        print(f"❌ Error creating .skill file: {e}")
+        print(f"❌ Error creating .skill file: {e}", file=sys.stderr)
         return None
 
 
 def main():
     if len(sys.argv) < 2:
+        print("Error: missing <path/to/skill-folder> argument", file=sys.stderr)
         print("Usage: python utils/package_skill.py <path/to/skill-folder> [output-directory]")
         print("\nExample:")
         print("  python utils/package_skill.py skills/public/my-skill")
@@ -129,6 +130,7 @@ def main():
     if result:
         sys.exit(0)
     else:
+        print(f"Error: failed to package skill at {skill_path}", file=sys.stderr)
         sys.exit(1)
 
 

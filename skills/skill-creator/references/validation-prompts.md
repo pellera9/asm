@@ -1,17 +1,16 @@
 # LLM Validation Prompts
 
-Optional 4-phase quality gate for a skill. Use these prompts before running full evals when you want a faster, cheaper smoke-test of the skill's structure and discoverability. Each prompt is copy-pasteable into a fresh Claude session.
+Four validation phases for a draft skill. **Phases 1–3 are the script for the mandatory adversarial review** (see "Adversarial review" in SKILL.md): hand them to a FRESH subagent — one that did not write the draft — together with the draft SKILL.md, and have it return findings. Phase 4 is optional architecture cleanup. Each prompt is also copy-pasteable into a fresh Claude session when no subagent is available.
 
-The goal is to surface bugs that quantitative evals might miss — triggering failures, ambiguous steps, adversarial breakage, and bloated architecture — without waiting for a full iteration of subagent runs.
+The goal is to surface bugs that quantitative evals might miss — triggering failures, ambiguous steps, adversarial breakage, and bloated architecture — without waiting for a full iteration of subagent runs. The reason for the fresh context is self-review blindness: the agent that wrote the draft resolves every ambiguity from memory instead of from the page, so it cannot see what's missing from the page.
 
 ## When to run these
 
-- Right after drafting a new skill, before the first eval run.
-- After a large rewrite, to sanity-check before spending tokens on evals.
-- Before shipping a version you plan to publish.
-- When an eval fails in a way you can't explain — one of these phases usually localizes the problem.
+- **Phases 1–3, via a fresh subagent: mandatory after drafting a new skill, before the first eval run.**
+- Phase 4: after a large rewrite, or before shipping a version you plan to publish.
+- Any phase: when an eval fails in a way you can't explain — one of these usually localizes the problem.
 
-You don't need to run all four every time. The phases are ordered so that each assumes the prior one passed: if discovery is broken, logic issues don't matter yet.
+The phases are ordered so that each assumes the prior one passed: if discovery is broken, logic issues don't matter yet.
 
 ## Phase 1 — Discovery validation
 

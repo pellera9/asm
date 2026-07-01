@@ -328,6 +328,7 @@ def init_skill(skill_name, path):
 
 def main():
     if len(sys.argv) < 4 or sys.argv[2] != '--path':
+        print("Error: expected 'init_skill.py <skill-name> --path <path>'", file=sys.stderr)
         print("Usage: init_skill.py <skill-name> --path <path>")
         print("\nSkill name requirements:")
         print("  - Hyphen-case identifier (e.g., 'data-analyzer')")
@@ -352,6 +353,7 @@ def main():
     if result:
         sys.exit(0)
     else:
+        print(f"Error: failed to initialize skill '{skill_name}' at {path}", file=sys.stderr)
         sys.exit(1)
 
 

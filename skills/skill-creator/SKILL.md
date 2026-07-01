@@ -4,13 +4,13 @@ description: "Create, improve, evaluate, benchmark skills. Use when authoring a 
 license: MIT
 effort: max
 metadata:
-  version: 1.11.0
-  author: Luong NGUYEN <luongnv89@gmail.com>
+  version: 1.13.0
+  author: "Luong NGUYEN <luongnv89@gmail.com>"
 ---
 
 # Skill Creator
 
-A skill for creating new skills and iteratively improving them. The agent's context budget is the primary constraint, so this SKILL.md links out to focused reference files instead of inlining their content.
+A skill for creating new skills and iteratively improving them. The agent's context budget is the primary constraint, so this SKILL.md links out to focused reference files.
 
 The core loop:
 
@@ -30,7 +30,7 @@ The skill supports two distinct workflows. **Identify which one the user is on b
 - **Path A — Create a new skill from scratch.** The user wants to capture a workflow, codify a pattern, or build a new capability. Start at **"Creating a skill"** below (Capture Intent → Interview → Write SKILL.md → Test → Eval).
 - **Path B — Improve an existing skill.** The user points to a skill that already exists and wants it brought up to standard, fixed, optimized, or iterated based on eval feedback. **Do not start with Capture Intent** — the intent is already encoded in the existing SKILL.md. Start at **"Improving an existing skill"** below.
 
-If the user's request is ambiguous ("can you look at this skill?"), assume **Path B** and ask them to confirm before interviewing them as if it were a new skill. Path B is also the one that fires when the user invokes `/skill-creator` while pointing at a skill directory or file.
+If the request is ambiguous ("can you look at this skill?"), assume **Path B** and confirm before interviewing as if it were new. Path B also fires when `/skill-creator` is invoked on a skill directory or file.
 
 Both paths share the mandatory rules below: **Repo Sync Before Edits**, **Version Management**, **YAML Frontmatter Safety**, and **Frontmatter Audit on Review/Evaluation**. Apply them in either path.
 
@@ -52,9 +52,9 @@ After completing each major step, output a status report in this format:
 
 Adapt the check names to match what the step actually validates. Use `√` for pass, `×` for fail, and `—` to add brief context. The "Criteria" line summarizes how many acceptance criteria were met. The "Result" line gives the overall verdict.
 
-**Intent Capture phase checks:** `Goal defined`, `Triggers identified`, `Output format agreed`
+**Intent Capture phase checks:** `Worth building`, `Goal defined`, `Triggers identified`, `Output format agreed`
 
-**Skill Writing phase checks:** `SKILL.md written`, `README generated`, `Subagents designed`, `Predictability pass` (the 7 rubric items from _Make it predictable_ — √ when each is satisfied, × naming the gap)
+**Skill Writing phase checks:** `SKILL.md written`, `README generated`, `Subagents designed`, `Predictability pass` (the 7 rubric items from _Make it predictable_ — √ when each is satisfied, × naming the gap), `Adversarial review` (fresh-subagent findings addressed)
 
 **Testing phase checks:** `Evals created`, `Runs completed`, `Viewer launched`
 
@@ -62,7 +62,7 @@ Adapt the check names to match what the step actually validates. Use `√` for p
 
 ## Communicating with the user
 
-Users span a wide range of technical familiarity. Match jargon to context cues: "evaluation" and "benchmark" are borderline-fine; "JSON" and "assertion" need clear cues that the user knows the term before you use it without explaining. Briefly define terms when in doubt.
+Users span a wide range of technical familiarity. Match jargon to context cues — terms like "JSON" or "assertion" need evidence the user knows them; briefly define terms when in doubt.
 
 ---
 
@@ -70,12 +70,8 @@ Users span a wide range of technical familiarity. Match jargon to context cues: 
 
 When creating or updating any skill that changes files in a git repository (code, docs, config, commits, publishing), include this rule in that skill's SKILL.md:
 
-- Add a **"Repo Sync Before Edits (mandatory)"** section near the top.
-- Require pulling latest remote branch before modifications:
-  - `branch="$(git rev-parse --abbrev-ref HEAD)"`
-  - `git fetch origin`
-  - `git pull --rebase origin "$branch"`
-- If working tree is dirty: stash, sync, then pop.
+- Add a **"Repo Sync Before Edits (mandatory)"** section near the top requiring `branch="$(git rev-parse --abbrev-ref HEAD)"; git fetch origin && git pull --rebase origin "$branch"` before modifications.
+- If the working tree is dirty: stash, sync, then pop.
 - If `origin` is missing or conflicts occur: stop and ask the user before continuing.
 
 Do not ship repo-mutating skills without this pre-sync guardrail.
@@ -85,7 +81,7 @@ Do not ship repo-mutating skills without this pre-sync guardrail.
 Read `references/frontmatter-rules.md` for the full mandatory rules:
 
 - **Version Management** — set `metadata.version: 1.0.0` on creation; bump patch/minor/major on every edit.
-- **YAML Frontmatter Safety** — quote any string value containing `:`, `#`, `-`, `<`, `>`, `|`, `{`, `}`, `[`, `]`, `,`, `&`, `*`, `?`, `=`, `!`, `%`, `@`, or `` ` ``.
+- **YAML Frontmatter Safety** — double-quote any string value containing YAML-special characters (full list in the reference).
 - **Frontmatter Audit on Review/Evaluation** — required-field check, name/dir match, allowed top-level keys, `metadata.version`, `metadata.author`, YAML safety, and consistency with `docs/README.md`. Run `python scripts/quick_validate.py <skill-path>` first; it catches mechanical issues without LLM reasoning.
 
 These rules apply on every write. Always confirm them before saving.
@@ -95,6 +91,8 @@ These rules apply on every write. Always confirm them before saving.
 ### Capture Intent
 
 Start by understanding the user's intent. The current conversation might already contain a workflow the user wants to capture (e.g., they say "turn this into a skill"). If so, extract answers from the conversation history first — the tools used, the sequence of steps, corrections the user made, input/output formats observed. The user fills the gaps and confirms before proceeding.
+
+**Gate first — should this be a skill at all?** A skill earns its place when the workflow is **repeated** (it will come up again), **non-obvious** (a capable agent without it would get it wrong), and **stable** (the process won't change next month). If it fails any of these, recommend against creating it — a one-off is better served by a plain prompt, and every unnecessary skill pollutes triggering for the rest. The user can override; the gate exists so the default isn't "always yes".
 
 1. What should this skill enable Claude to do?
 2. When should this skill trigger? (what user phrases/contexts)
@@ -106,7 +104,7 @@ Start by understanding the user's intent. The current conversation might already
    - Does the skill need independent quality review? → Review loop with fresh subagents
    - Will the skill produce large artifacts that require focused reasoning? → Executor subagent
      If any apply, design the skill with a main-agent-as-orchestrator architecture so subagents handle the heavy lifting and the main conversation context stays clean.
-6. **Model-invoked or user-invoked?** Decide the _primary_ invocation before drafting — it changes how you write the skill. **Model-invoked** (the default) is for a reusable discipline the agent applies on its own when the situation fits; optimize the description for reliable triggering. **User-invoked** (`/skill-name`) is for orchestration or control the user runs deliberately (a pipeline, an expensive or destructive action); the body reads as "the user asked for this, proceed." Weigh the **context-load and cognitive-load** budgets here too — keep the skill small and design its structure around them. See `references/predictability-rubric.md` for the full tradeoff.
+6. **Model-invoked or user-invoked?** Decide the _primary_ invocation before drafting — it changes how you write. **Model-invoked** (the default) is a reusable discipline the agent applies when the situation fits; optimize the description for reliable triggering. **User-invoked** (`/skill-name`) is orchestration the user runs deliberately (a pipeline, an expensive or destructive action); the body reads as "the user asked for this, proceed." Weigh the **context-load and cognitive-load** budgets here too. See `references/predictability-rubric.md` for the full tradeoff.
 
 ### Interview and Research
 
@@ -116,7 +114,7 @@ Proactively ask questions about edge cases, input/output formats, example files,
 
 ### Write the SKILL.md
 
-Based on the user interview, fill in:
+Before drafting, skim `references/exemplars.md` and imitate the archetype closest to this skill — workflow, knowledge, or orchestrator. Then, based on the user interview, fill in:
 
 - **name**: 1-64 chars, lowercase letters/digits/hyphens, no consecutive hyphens, exactly matches parent directory. Enforced by `scripts/quick_validate.py`.
 - **description**: When to trigger and what it does. Primary triggering mechanism. Single line, no newlines. Claude tends to _undertrigger_ — make descriptions a little "pushy", with negative triggers.
@@ -124,28 +122,9 @@ Based on the user interview, fill in:
 - **metadata.version**: Semver string (see frontmatter rules).
 - **compatibility**: Required tools or dependencies (rare).
 
-#### Writing a good description: pushy + negative triggers
+#### Writing a good description
 
-A description has two jobs: pull in the queries that _should_ trigger the skill, and push away the queries from adjacent domains that _shouldn't_. Most authors do the first part well and forget the second, producing false-positive triggers — a Tailwind skill running on a Vue project, a Python skill firing on shell-script questions.
-
-**The fix is a "Don't use for ..." clause.** Name adjacent domains that share keywords or intent but are the wrong fit.
-
-- Positive only: `Creates React components using Tailwind CSS.`
-- With negatives: `Creates React components using Tailwind CSS. Use whenever the user asks for a new React component, UI element, or styled layout. Don't use for Vue, Svelte, vanilla CSS, or plain HTML projects.`
-
-Write positive and negative halves as one continuous sentence or two back-to-back sentences — not a structured list. `scripts/quick_validate.py` warns (non-fatal) when the negative-trigger clause appears missing.
-
-**One trigger per branch.** Every word in the description costs context load on every turn, so name each distinct triggering branch once and stop. Two triggers that describe the _same_ branch in different words ("build features test-first … asks for TDD") are that branch written twice — keep one. List only genuinely distinct branches, plus a short "when another skill needs…" clause if another skill must reach this one.
-
-#### Description length budget
-
-Three limits, in order of which one bites first:
-
-1. **250 chars** — Claude Code's `/skills` listing cap. Anything beyond is **truncated tail-first**, chopping the negative-trigger clause. This is the limit that actually shapes triggering behavior.
-2. **~2% of context window** (~16k chars total, ~109 chars overhead per skill) — the shared `available_skills` budget. When it overflows, extra skills become **invisible to the agent**.
-3. **1024 chars** — the API spec ceiling, hard error.
-
-**Rule: target ≤250 characters.** Treat 1024 as a hard error, not a goal. Lead with verbs, drop hedge words ("helps", "allows you to"), collapse synonyms, keep the negative half to two or three adjacent domains.
+Read `references/description-guide.md` for the full guide: the pushy + negative-triggers pattern (a "Don't use for ..." clause naming 2–3 adjacent domains), one trigger per branch, and the three length limits. The rule that bites first: **target ≤250 characters** — Claude Code's `/skills` listing truncates tail-first beyond that, chopping the negative-trigger clause. `scripts/quick_validate.py` warns (non-fatal) when the negative clause looks missing.
 
 ### Skill Writing Guide
 
@@ -154,13 +133,13 @@ Read `references/writing-guide.md` for the full guide. It covers:
 - **Anatomy of a skill** — directory layout, where `agents/`, `references/`, `scripts/`, `assets/`, `docs/` go.
 - **Progressive disclosure** — three-level loading, the 500-line SKILL.md cap, when to split into `references/`.
 - **Principle of Lack of Surprise** — no malware, no misleading skills.
-- **Writing patterns** — imperative voice, output-format templates, examples patterns.
+- **Writing and workflow patterns** — imperative voice, output-format strictness, examples, the workflow-pattern table.
 - **Bundled scripts and error messages** — scripts must print descriptive errors before exiting so the agent can self-correct.
 - **Step Completion Reports** — every skill emits one after each major phase.
 - **Writing style** — explain _why_ in lieu of heavy MUSTs.
 - **Generate README.md** — `docs/README.md` only, with AI-skip notice; see `references/readme-template.md`.
-- **Test Cases** — 2-3 realistic prompts saved to `evals/evals.json`; see `references/schemas.md`.
-- **Optional pre-eval LLM validation** — see `references/validation-prompts.md`.
+- **Test Cases** — the 5-prompt floor (≥3 happy-path, ≥1 edge, ≥1 should-NOT-trigger) saved to `evals/evals.json`; see `references/schemas.md`.
+- **Pre-eval LLM validation** — the phases behind the mandatory adversarial review; see `references/validation-prompts.md`.
 
 ### Make it predictable (publish-ready by construction)
 
@@ -174,6 +153,10 @@ The goal of creating a skill here is a **predictable process** — the agent fol
 Before finishing, **walk all 7 rubric items** (`references/predictability-rubric.md` — the four hooks above plus invocation choice, branch mapping, and publish-ready) and emit the result as the `Predictability pass` row of the Skill Writing Step Completion Report: `√` per item satisfied, `×` naming any gap. This makes the rubric walk visible instead of silent — a `×` is a fix-before-publish signal, not a blocker.
 
 `skill-auto-improver` remains the remediation tool for _externally authored_ or _legacy_ skills — not a required second stage for a skill created through this path.
+
+### Adversarial review (mandatory before evals)
+
+The drafting context cannot review its own draft — it fills every gap from memory instead of from the page. After the rubric walk, spawn a **fresh subagent** with the draft skill and phases 1–3 of `references/validation-prompts.md` (discovery, logic walk, edge-case attack); it returns trigger misses, ambiguous steps, and breaking prompts. Fix the real findings before running evals; carry the rest into the test set. If no Agent tool is available, run the phases yourself in a fresh session (see `references/environment-modes.md`).
 
 ## Running and evaluating test cases
 
@@ -210,7 +193,7 @@ This subpath does **not** require running evals. Skip to subpath B2 only if body
 
 Use this when the user has eval results (or wants to run evals) and wants the skill revised based on what the evals show. The opening move is the **eval loop**, not interviewing.
 
-1. If evals already exist, read the latest results and the user's `feedback.json`. If not, run them per "Running and evaluating test cases" above.
+1. Read `evals/misfires.jsonl` first if present — logged real-world failures are the highest-signal evals; convert them into test cases (schema in `references/schemas.md`). Then, if evals already exist, read the latest results and the user's `feedback.json`; if not, run them per "Running and evaluating test cases" above.
 2. Read `references/iteration.md` for the five principles of revision (generalize, stay lean, explain the why, spot repeated work, consider subagents) and the iteration loop (apply → rerun → review → repeat).
 3. Run the **Frontmatter Audit** alongside content revision — a polished body on top of broken frontmatter still fails validation.
 4. Bump `metadata.version` per Version Management — minor for new capabilities or expanded triggers, patch for wording fixes.
@@ -226,13 +209,11 @@ Read `references/description-optimization.md` for the full 4-step flow: generate
 
 ### Package and Present (only if `present_files` tool is available)
 
-Check whether you have access to the `present_files` tool. If not, skip. If yes, package the skill and present the `.skill` file:
+If the `present_files` tool is available (otherwise skip), package the skill and present the resulting `.skill` file path so the user can install it:
 
 ```bash
 python -m scripts.package_skill <path/to/skill-folder>
 ```
-
-After packaging, direct the user to the resulting `.skill` file path so they can install it.
 
 ## Environment-specific notes
 
@@ -252,12 +233,12 @@ The `references/` directory has additional documentation:
 
 - `references/frontmatter-rules.md` — Version Management, YAML Safety, and Frontmatter Audit (mandatory).
 - `references/predictability-rubric.md` — The predictability standard a new skill must meet by construction: invocation choice, branch mapping, demanding completion criteria, leading words, the pruning pass, and publish-ready (no auto-improver dependency).
-- `references/writing-guide.md` — Anatomy, progressive disclosure, writing patterns, error messages, test cases.
-- `references/schemas.md` — JSON structures for evals.json, grading.json, etc.
+- `references/description-guide.md` — Pushy + negative-trigger description pattern, one trigger per branch, length budget.
+- `references/exemplars.md` — Three annotated exemplar skills (workflow, knowledge, orchestrator) to imitate.
+- `references/writing-guide.md` — Anatomy, progressive disclosure, writing and workflow patterns, error messages, test cases.
+- `references/schemas.md` — JSON structures for evals.json, misfires.jsonl, grading.json, etc.
 - `references/subagent-patterns.md` — When and how to design skills that use the Agent tool.
-- `references/workflows.md` — Workflow patterns for structuring skill instructions.
-- `references/output-patterns.md` — Output format and file-writing patterns.
-- `references/validation-prompts.md` — Optional 4-phase LLM validation pass for a draft skill.
+- `references/validation-prompts.md` — The 4 validation phases; 1–3 script the mandatory adversarial review.
 - `references/eval-loop.md` — Full 5-step eval run / grade / viewer flow.
 - `references/iteration.md` — Principles for improving a skill based on feedback; blind comparison.
 - `references/description-optimization.md` — 4-step description-tuning workflow.
@@ -266,4 +247,4 @@ The `references/` directory has additional documentation:
 
 ---
 
-If you maintain a task list, include "Create evals JSON and run `eval-viewer/generate_review.py` so human can review test cases" — especially in Cowork, where it's easy to skip.
+In any task list, include "Create evals JSON and run `eval-viewer/generate_review.py` for human review" — especially in Cowork, where it's easy to skip.

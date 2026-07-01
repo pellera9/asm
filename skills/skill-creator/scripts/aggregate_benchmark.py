@@ -363,7 +363,7 @@ def main():
     args = parser.parse_args()
 
     if not args.benchmark_dir.exists():
-        print(f"Directory not found: {args.benchmark_dir}")
+        print(f"Error: benchmark directory not found: {args.benchmark_dir}", file=sys.stderr)
         sys.exit(1)
 
     # Generate benchmark

@@ -2,6 +2,10 @@
 
 This is the heart of the loop. You've run the test cases, the user has reviewed the results, and now you need to make the skill better based on their feedback.
 
+## Start with the misfire log
+
+Before anything else, check `evals/misfires.jsonl` in the skill directory (schema in `references/schemas.md`). Each line is a failure a real user already hit — strictly better signal than any synthetic test case. Convert misfires into eval cases and let them drive this iteration's priorities; a skill that fixes its logged misfires improves where it actually hurts, not where the author guessed. If the file is missing or empty, proceed on user feedback alone — and remember to append to it whenever a misfire surfaces during your own sessions.
+
 ## How to think about improvements
 
 1. **Generalize from the feedback.** The big picture thing that's happening here is that we're trying to create skills that can be used a million times (maybe literally, maybe even more who knows) across many different prompts. Here you and the user are iterating on only a few examples over and over again because it helps move faster. The user knows these examples in and out and it's quick for them to assess new outputs. But if the skill you and the user are codeveloping works only for those examples, it's useless. Rather than put in fiddly overfitty changes, or oppressively constrictive MUSTs, if there's some stubborn issue, you might try branching out and using different metaphors, or recommending different patterns of working. It's relatively cheap to try and maybe you'll land on something great.

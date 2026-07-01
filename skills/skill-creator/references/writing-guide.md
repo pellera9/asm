@@ -1,6 +1,8 @@
 # Skill Writing Guide
 
-Anatomy, progressive disclosure, writing patterns, bundled-script hygiene, and the report-format conventions used in skill bodies.
+Anatomy, progressive disclosure, writing patterns, workflow patterns, output patterns, bundled-script hygiene, test cases, and the report-format conventions used in skill bodies.
+
+Contents: [Anatomy](#anatomy-of-a-skill) · [Progressive Disclosure](#progressive-disclosure) · [Lack of Surprise](#principle-of-lack-of-surprise) · [Writing Patterns](#writing-patterns) · [Workflow Patterns](#workflow-patterns) · [Scripts & Errors](#bundled-scripts-and-error-messages) · [Step Completion Reports](#step-completion-reports) · [Style](#writing-style) · [README](#generate-readmemd) · [Test Cases](#test-cases) · [Pre-eval Validation](#pre-eval-llm-validation)
 
 ## Anatomy of a Skill
 
@@ -59,7 +61,7 @@ Skills must not contain malware, exploit code, or any content that could comprom
 
 Prefer the imperative form in instructions.
 
-**Defining output formats** — like this:
+**Defining output formats** — match strictness to requirements. For strict formats (API responses, data files), pin the template:
 
 ```markdown
 ## Report structure
@@ -75,7 +77,9 @@ ALWAYS use this exact template:
 ## Recommendations
 ```
 
-**Examples pattern** — useful to include real input/output:
+For flexible guidance, offer a sensible default and say adaptation is allowed ("Here is a sensible default format, but use your best judgment; adjust sections for the analysis type"). Choosing the wrong strictness cuts both ways: a pinned template on a judgment task produces rigid junk; a loose one on a data format produces parse failures.
+
+**Examples pattern** — where output quality depends on style, one or two input/output pairs teach more than paragraphs of description:
 
 ```markdown
 ## Commit message format
@@ -83,6 +87,45 @@ ALWAYS use this exact template:
 **Example 1:**
 Input: Added user authentication with JWT tokens
 Output: feat(auth): implement JWT-based authentication
+
+Follow this style: type(scope): brief description
+```
+
+**Validation checklist pattern** — for skills that deliver artifacts, end with a short verify-before-delivering checklist (required sections present, no placeholder text, links valid, error cases handled). Keep it specific to the artifact type.
+
+For description writing (pushy triggers, negative clauses, length budget), read `references/description-guide.md`. For three fully annotated exemplar skills to imitate, read `references/exemplars.md`.
+
+## Workflow Patterns
+
+Pick the pattern that matches the skill's control flow — don't force a sequential spine onto a knowledge skill (see the `postgres-migrations` exemplar for the no-workflow archetype).
+
+| Pattern                      | Use when                                                | Key techniques                                                                                             |
+| ---------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Sequential workflow          | Multi-step process, order matters                       | Explicit step order, dependencies named, validation gate per step, rollback instructions                   |
+| Conditional branches         | Distinct modes (create vs edit, per-framework)          | Early selector, branch-local instructions, shared rules stated once                                        |
+| Multi-service coordination   | Workflow spans several tools/MCPs                       | Clear phase separation, data passed explicitly between phases, validate before advancing                   |
+| Iterative refinement         | Quality improves with iteration                         | Explicit quality criteria, validation script, a stop condition ("repeat until X or N rounds")              |
+| Context-aware tool selection | Same outcome, different tool by context                 | Decision criteria as a table/tree, fallback option, tell the user why                                      |
+| Domain-specific intelligence | Skill adds compliance/expertise gates around tool calls | Check before act, document the decision, audit trail                                                       |
+| Subagent orchestration       | Heavy reading or parallel work would bloat main context | Read `references/subagent-patterns.md` — orchestrator stays lean, contracts per role, fresh-context review |
+| Guided discovery             | Skill must gather info from the user before acting      | Ask → confirm understanding → execute only after explicit approval → report                                |
+
+Two of these deserve a concrete sketch because authors most often get them wrong:
+
+**Conditional branches** — put the selector first, so a run only reads its own branch:
+
+```markdown
+1. Determine the modification type:
+   **Creating new content?** → Follow "Creation workflow" below
+   **Editing existing content?** → Follow "Editing workflow" below
+```
+
+**Iterative refinement** — always give the loop a stop condition:
+
+```markdown
+1. Generate draft → 2. Run `scripts/check_report.py` → 3. Fix each flagged issue
+   → 4. Re-validate. Repeat until the checker passes or 3 rounds — then report
+   remaining issues instead of looping forever.
 ```
 
 ## Bundled scripts and error messages
@@ -142,37 +185,20 @@ Read `references/readme-template.md` when authoring or updating a `docs/README.m
 
 ## Test Cases
 
-After writing the skill draft, come up with 2-3 realistic test prompts — the kind of thing a real user would actually say. Share them with the user and ask whether to add more, then run them.
+After writing the skill draft, build a test set of **at least 5 prompts**:
 
-Save test cases to `evals/evals.json`. Don't write assertions yet — just the prompts. Draft assertions in the next step while runs are in progress.
+- **≥3 realistic happy-path prompts** — the kind of thing a real user would actually say, phrased differently from each other.
+- **≥1 edge case** — boundary input, missing precondition, or a conflicting instruction the skill should handle or refuse cleanly.
+- **≥1 should-NOT-trigger prompt** — an adjacent-domain request (the ones named in the description's negative clause). The pass condition is that the agent does _not_ apply the skill's workflow to it.
 
-```json
-{
-  "skill_name": "example-skill",
-  "evals": [
-    {
-      "id": 1,
-      "prompt": "User's task prompt",
-      "expected_output": "Description of expected result",
-      "files": []
-    }
-  ]
-}
-```
+Two or three happy-path prompts alone verify only the demo path — they will not catch the failures users actually hit. Share the set with the user and ask whether to add more, then run them.
+
+Save test cases to `evals/evals.json` with a `kind` per eval (`happy-path` | `edge` | `negative-trigger`). Don't write assertions yet — just the prompts. Draft assertions in the next step while runs are in progress; include at least one **process assertion** per happy-path eval (did the run follow the skill's mandated sequence, use its scripts, emit its report?) — output-only assertions let a run pass while ignoring the skill entirely.
 
 See `references/schemas.md` for the full schema (including the `assertions` field, added later).
 
-Read `references/output-patterns.md` when designing output formats or file-writing behavior for a skill.
-Read `references/workflows.md` when structuring multi-phase workflows or iteration loops in a skill.
 Read `references/subagent-patterns.md` when the skill involves heavy exploration, parallel tasks, review loops, or large artifact generation.
 
-## Optional: pre-eval LLM validation
+## Pre-eval LLM validation
 
-Before spending tokens on full eval runs, you can run a cheaper 4-phase LLM validation pass to catch triggering failures, ambiguous logic, edge-case blind spots, and architectural bloat. Read `references/validation-prompts.md` for the copy-pasteable prompts:
-
-1. **Discovery validation** — does the frontmatter trigger correctly in isolation?
-2. **Logic validation** — simulated step-by-step execution to find ambiguous instructions
-3. **Edge case testing** — adversarial prompts to find failure states
-4. **Architecture refinement** — enforces progressive disclosure and token discipline
-
-Optional — useful right after drafting a skill, after a large rewrite, or when an eval fails in a way you can't explain.
+Phases 1–3 of `references/validation-prompts.md` (discovery, logic walk, edge-case attack) are the material the **mandatory adversarial review** runs against every new draft — see "Adversarial review" in SKILL.md. Phase 4 (architecture refinement) is optional: run it after a large rewrite, before publishing, or when an eval fails in a way you can't explain.

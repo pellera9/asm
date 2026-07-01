@@ -24,6 +24,8 @@ Execute this task:
 - **Creating a new skill**: no skill at all. Same prompt, no skill path, save to `without_skill/outputs/`.
 - **Improving an existing skill**: the old version. Before editing, snapshot the skill (`cp -r <skill-path> <workspace>/skill-snapshot/`), then point the baseline subagent at the snapshot. Save to `old_skill/outputs/`.
 
+**Negative-trigger evals** (`kind: negative-trigger`) run with-skill only — no baseline; the comparison is meaningless when the skill shouldn't fire. Their assertions check that the run did _not_ apply the skill's workflow (no skill scripts invoked, no skill report format, the adjacent task handled on its own merits).
+
 Write an `eval_metadata.json` for each test case (assertions can be empty for now). Give each eval a descriptive name based on what it's testing — not just "eval-0". Use this name for the directory too. If this iteration uses new or modified eval prompts, create these files for each new eval directory — don't assume they carry over from previous iterations.
 
 ```json
@@ -40,6 +42,8 @@ Write an `eval_metadata.json` for each test case (assertions can be empty for no
 Don't just wait for the runs to finish — you can use this time productively. Draft quantitative assertions for each test case and explain them to the user. If assertions already exist in `evals/evals.json`, review them and explain what they check.
 
 Good assertions are objectively verifiable and have descriptive names — they should read clearly in the benchmark viewer so someone glancing at the results immediately understands what each one checks. Subjective skills (writing style, design quality) are better evaluated qualitatively — don't force assertions onto things that need human judgment.
+
+Include at least one **process assertion** per happy-path eval — one that checks the run followed the skill's mandated path (used its script, respected its step order, emitted its report format), not just that the output looks right. Output-only assertions can pass while the agent ignored the skill entirely, which hides triggering and adherence failures from the benchmark.
 
 Update the `eval_metadata.json` files and `evals/evals.json` with the assertions once drafted. Also explain to the user what they'll see in the viewer — both the qualitative outputs and the quantitative benchmark.
 
