@@ -3396,9 +3396,9 @@ async function cmdInstall(args: ParsedArgs) {
     if (!args.flags.yes) {
       // Skip confirmation for skills that are being linked (already decided)
       const needsConfirmation = inspections.some(
-        (i) =>
-          i.installStatus !== "LINK_AVAILABLE" ||
-          linkChoices.get(i) === "reinstall",
+        (inspection, idx) =>
+          inspection.installStatus !== "LINK_AVAILABLE" ||
+          linkChoices.get(idx) === "reinstall",
       );
 
       if (needsConfirmation) {

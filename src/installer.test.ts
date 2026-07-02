@@ -2048,7 +2048,7 @@ describe("linkExistingSkill", () => {
     await rm(tempDir, { recursive: true, force: true });
   });
 
-  function makeConfig() {
+  function makeConfig(): AppConfig {
     return {
       version: 1,
       providers: [
@@ -2116,10 +2116,19 @@ describe("linkExistingSkill", () => {
     const config = makeConfig();
     const claudeDir = join(tempDir, "claude-skills");
     const codexDir = join(tempDir, "codex-skills");
-    const claudeSkillDir = await createSkillInProvider(claudeDir, "code-review");
+    const claudeSkillDir = await createSkillInProvider(
+      claudeDir,
+      "code-review",
+    );
 
     // First link
-    await linkExistingSkill("code-review", claudeSkillDir, "codex", "global", config);
+    await linkExistingSkill(
+      "code-review",
+      claudeSkillDir,
+      "codex",
+      "global",
+      config,
+    );
 
     // Create a different source
     const piDir = join(tempDir, "pi-skills-real");
@@ -2152,7 +2161,14 @@ describe("linkExistingSkill", () => {
 
     // Try without force — should throw
     await expect(
-      linkExistingSkill("code-review", skillDir, "codex", "global", config, false),
+      linkExistingSkill(
+        "code-review",
+        skillDir,
+        "codex",
+        "global",
+        config,
+        false,
+      ),
     ).rejects.toThrow("Target already exists");
   });
 

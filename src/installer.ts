@@ -944,7 +944,7 @@ export interface CrossToolLinkInfo {
 export async function checkCrossToolLink(
   skillName: string,
   targetProviderName: string,
-  config: import("./config").AppConfig,
+  config: AppConfig,
 ): Promise<CrossToolLinkInfo | null> {
   for (const provider of config.providers) {
     if (!provider.enabled) continue;
@@ -996,7 +996,7 @@ export async function linkExistingSkill(
   sourcePath: string,
   targetProviderName: string,
   targetScope: "global" | "project",
-  config: import("./config").AppConfig,
+  config: AppConfig,
   force: boolean = false,
 ): Promise<string> {
   const provider = config.providers.find((p) => p.name === targetProviderName);
@@ -1006,15 +1006,14 @@ export async function linkExistingSkill(
     );
   }
 
-  const basePath = targetScope === "project" ? provider.project : provider.global;
+  const basePath =
+    targetScope === "project" ? provider.project : provider.global;
   const providerDir = resolveProviderPath(basePath);
   const targetPath = join(providerDir, skillName);
 
   // Use the linker's createLink which handles force, mkdir, and symlink
   await createLink(sourcePath, providerDir, skillName, force);
 
-  debug(
-    `install: linked "${skillName}" from ${sourcePath} -> ${targetPath}`,
-  );
+  debug(`install: linked "${skillName}" from ${sourcePath} -> ${targetPath}`);
   return targetPath;
 }

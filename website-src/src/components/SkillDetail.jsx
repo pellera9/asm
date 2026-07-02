@@ -53,7 +53,6 @@ export default function SkillDetail({ slim }) {
   const skill = useMemo(() => detail.data || slim, [detail.data, slim]);
   if (!skill) return null;
 
-  const cmd = "asm install " + skill.installUrl;
   const evalScoreCls = skill.evalSummary
     ? evalScoreClass(skill.evalSummary.overallScore)
     : "";

@@ -283,7 +283,7 @@ const ENTRIES = [
           </>,
           <>
             <code>fix(test):</code> Bundle modify/export tests no longer leak
-            installed skill copies into the user's real{" "}
+            installed skill copies into the user&apos;s real{" "}
             <code>~/.claude/skills/</code> ({issue(288)})
           </>,
           <>
@@ -621,7 +621,7 @@ const ENTRIES = [
             <code>skill-best-practice</code> to avoid collision with the
             Anthropic <code>skill-creator</code> skill; include warning-severity
             checks in the score denominator; add per-check √/×/⚠ breakdown under
-            each extra provider's score line
+            each extra provider&apos;s score line
           </>,
         ],
       },
@@ -640,9 +640,9 @@ const ENTRIES = [
         items: [
           <>
             Include <code>relPath</code> in the catalog dedup key so
-            plugin-bundle variants aren't dropped — recovers ~3k installable
-            targets that the <code>owner/repo::name</code> key had silently
-            collapsed; regression tests assert{" "}
+            plugin-bundle variants aren&apos;t dropped — recovers ~3k
+            installable targets that the <code>owner/repo::name</code> key had
+            silently collapsed; regression tests assert{" "}
             <code>totalSkills === skills.length</code> and unique{" "}
             <code>installUrl</code> per entry ({issue(201)}, {pr(203)})
           </>,
@@ -1789,7 +1789,7 @@ function versionSlug(v) {
   return `v-${v.replace(/\./g, "-")}`;
 }
 
-function Entry({ version, date, sections, index }) {
+function Entry({ version, date, sections }) {
   const f = formatDate(date);
   return (
     <section id={versionSlug(version)} className="cl-entry">
